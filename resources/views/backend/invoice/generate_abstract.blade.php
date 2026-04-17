@@ -28,7 +28,7 @@
             </td>
 
             <td width="60%" style="border:none; text-align:center;">
-                <h2 style="margin:0;"> NEXOCART</h2>
+                <h2 style="margin:0;"> SOLAI FOODS</h2>
                 <p style="margin:5px 0;">
                 <b>{{ $company->company_address }} , <br>{{  $company->state }}.</b> <br>
                 <b>  Email :  {{ $company->email }} </b> </p>

@@ -14,10 +14,10 @@
 <p><strong>Affiliate</strong> means an entity that controls, is controlled by, or is under common control with a party, where &quot;control&quot; means ownership of 50% or more of the shares, equity interest or other securities entitled to vote for election of directors or other managing authority.</p>
 </li>
 <li>
-<p><strong>Application</strong> refers to NexoCart, the software program provided by the Company.</p>
+<p><strong>Application</strong> refers to Solai Foods, the software program provided by the Company.</p>
 </li>
 <li>
-<p><strong>Company</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Privacy Policy) refers to NexoCart, Rajapalayam, Tamil Nadu-626117.</p>
+<p><strong>Company</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Privacy Policy) refers to Solai Foods, Rajapalayam, Tamil Nadu-626117.</p>
 </li>
 <li>
 <p><strong>Country</strong> refers to: Tamil Nadu,  India</p>
@@ -183,7 +183,7 @@
 <p>If you have any questions about this Privacy Policy, You can contact us:</p>
 <ul>
 <li>
-<p>By email: nexocart2026@gamil.com</p>
+<p>By email: solaifoods2026@gmail.com</p>
 </li>
 <li>
 <p>By phone: 8608605499</p>

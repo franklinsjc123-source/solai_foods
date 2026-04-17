@@ -14,7 +14,7 @@
             {{-- <div class="d-flex justify-content-between align-items-center gap-2"> --}}
              <script>
                  document.write(new Date().getFullYear())
-             </script> © NEXO CART
+             </script> © Solai Foods
          {{-- </div> --}}
          </center>
      </div>

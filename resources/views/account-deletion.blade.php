@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Nexocart – Account Deletion Request</title>
+    <title>Solai Foods – Account Deletion Request</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -234,8 +234,8 @@
 
     <section class="hero-section">
         <div class="container">
-            <img src="{{ asset('backend_assets/images/logo.jpg') }}" alt="Nexocart Logo" class="app-logo">
-            <h1>Nexocart</h1>
+            <img src="{{ asset('backend_assets/images/logo.jpg') }}" alt="Solai Foods Logo" class="app-logo">
+            <h1>Solai Foods</h1>
             <p>Account Deletion Request</p>
         </div>
     </section>
@@ -280,7 +280,7 @@
         </div>
 
         <footer class="footer">
-            <p>&copy; {{ date('Y') }} Nexocart. Rajapalayam, Tamil Nadu, India.</p>
+            <p>&copy; {{ date('Y') }} Solai Foods. Rajapalayam, Tamil Nadu, India.</p>
             <a href="{{ route('privacy-policy') }}" class="text-decoration-none text-muted mx-2">Privacy Policy</a>
             <a href="/" class="text-decoration-none text-muted mx-2">Login</a>
         </footer>

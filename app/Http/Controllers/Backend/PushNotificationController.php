@@ -41,7 +41,7 @@ class PushNotificationController extends Controller
 
         // Send to all customers (auth_level 3)
         $customers = User::where('auth_level', 3)->get();
-        $title     = "New Notification - NexOcart";
+        $title     = "New Notification - Solai Foods";
         $imageUrl  = $notification_image ? asset('uploads/notifications/' . $notification_image) : null;
 
         $sentCount = 0;

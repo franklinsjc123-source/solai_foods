@@ -46,9 +46,9 @@ class AuthController extends Controller
 
                 User::where('id', $user->id)->update($updateArray);
 
-                $message = "Your NexOcart verification code is $otp. Do not share this OTP with anyone.";
+                $message = "Your Solai Foods verification code is $otp. Do not share this OTP with anyone.";
 
-                $this->sendNotification($user->id, 'NexOcart OTP Verification',  $message);
+                $this->sendNotification($user->id, 'Solai Foods OTP Verification',  $message);
 
 
                 $success_array = array('status' => 'success', 'message' => 'OTP send successfully', 'otp' => $otp);
@@ -85,9 +85,9 @@ class AuthController extends Controller
 
                 User::where('id', $user->id)->update($updateArray);
 
-                $message = "Your NexOcart verification code is $otp. Do not share this OTP with anyone.";
+                $message = "Your Solai Foods verification code is $otp. Do not share this OTP with anyone.";
 
-                $this->sendNotification($user->id, 'NexOcart OTP Verification',  $message);
+                $this->sendNotification($user->id, 'Solai Foods OTP Verification',  $message);
 
 
                 $success_array = array('status' => 'success', 'message' => 'OTP send successfully');
@@ -165,7 +165,7 @@ class AuthController extends Controller
             // Send push notification to the newly registered user
             if (!empty($device_id)) {
                 try {
-                    sendPushNotificationToUser($device_id, 'Welcome to NexOCart!', 'You have registered successfully. Start exploring now!');
+                    sendPushNotificationToUser($device_id, 'Welcome to Solai Foods!', 'You have registered successfully. Start exploring now!');
                 } catch (\Exception $e) {
                     // Log the error but don't fail the registration
                     \Log::error('Push notification failed for user ' . $user->id . ': ' . $e->getMessage());

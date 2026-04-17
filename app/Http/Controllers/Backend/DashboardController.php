@@ -49,7 +49,49 @@ class DashboardController extends Controller
         }
 
 
-        return view('backend.dashboard', compact('customer_count', 'order_count', 'delivert_person_count', 'today_order_count', 'categoryLabels', 'shopCounts', 'productCounts', 'product_count', 'shop_count'));
+        $category_count             = DB::table('category')->count();
+
+        // Monthly Orders for Bar Chart
+        $monthlyOrders = Order::select(
+                DB::raw('COUNT(id) as count'),
+                DB::raw("DATE_FORMAT(created_at, '%M') as month"),
+                DB::raw("MONTH(created_at) as month_num")
+            )
+            ->whereYear('created_at', date('Y'))
+            ->groupBy('month', 'month_num')
+            ->orderBy('month_num')
+            ->get();
+
+        $monthLabels = [];
+        $monthCounts = [];
+
+        // Initialize all months to 0
+        for ($m = 1; $m <= 12; $m++) {
+            $monthName = date('F', mktime(0, 0, 0, $m, 1));
+            $monthLabels[] = $monthName;
+            $monthCounts[$monthName] = 0;
+        }
+
+        foreach ($monthlyOrders as $order) {
+            $monthCounts[$order->month] = $order->count;
+        }
+
+        $monthlyOrderData = array_values($monthCounts);
+
+        return view('backend.dashboard', compact(
+            'customer_count', 
+            'order_count', 
+            'delivert_person_count', 
+            'today_order_count', 
+            'categoryLabels', 
+            'shopCounts', 
+            'productCounts', 
+            'product_count', 
+            'shop_count', 
+            'category_count',
+            'monthLabels',
+            'monthlyOrderData'
+        ));
     }
 
     public function privacy_policy()
