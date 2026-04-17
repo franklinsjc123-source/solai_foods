@@ -92,21 +92,7 @@
                                             @error('product_name') <span class="text-danger">{{ $message }}</span> @enderror
                                         </div>
 
-                                            <div class="col-xl-4" id="food_type_div">
-                                                <label for="food_type" class="form-label">
-                                                    Food Type <span class="text-danger">*</span>
-                                                </label>
 
-                                                <select name="food_type" id="food_type" class="form-select ">
-                                                    <option value="">Select Type</option>
-                                                    <option value="veg" {{ old('food_type', $food_type) == 'veg' ? 'selected' : '' }}>Veg</option>
-                                                    <option value="non_veg" {{ old('food_type', $food_type) == 'non_veg' ? 'selected' : '' }}>Non-Veg</option>
-                                                </select>
-
-                                                @error('food_type')
-                                                    <span class="text-danger">{{ $message }}</span>
-                                                @enderror
-                                            </div>
 
 
 
@@ -189,7 +175,7 @@
                                                     <div class="row mt-5 quantity-row align-items-end" data-index="{{ $index }}">
 
                                                         <div class="col-xl-3">
-                                                            <label class="form-label"> Unit <span class="text-danger"></span></label>
+                                                            <label class="form-label"> Unit <span class="text-danger">*</span></label>
                                                             <select class="form-control select2"  name="unit[]">
                                                             <option value="">--select--</option>
                                                                     <?php
@@ -222,7 +208,7 @@
                                                         </div>
 
                                                         <div class="col-xl-2">
-                                                            <label class="form-label">Discount Price</label>
+                                                            <label class="form-label">Discount Price <span class="text-danger">*</span></label>
                                                             <input type="text" class="form-control discount_price" name="discount_price[]"  value="<?= old('discount_price',$ba->discount_price) ?? '' ?>"  readonly>
                                                         </div>
 
@@ -242,7 +228,7 @@
                                                 <div class="row mt-5 quantity-row align-items-end" data-index="0">
 
                                                     <div class="col-xl-3">
-                                                        <label class="form-label"> Unit <span class="text-danger"></span></label>
+                                                        <label class="form-label"> Unit <span class="text-danger">*</span></label>
                                                         <select class="form-control select2"  name="unit[]">
                                                         <option value="">--select--</option>
                                                                 <?php
@@ -274,7 +260,7 @@
                                                     </div>
 
                                                     <div class="col-xl-2">
-                                                        <label class="form-label">Discount Price</label>
+                                                        <label class="form-label">Discount Price  <span class="text-danger">*</span> </label>
                                                         <input type="text" class="form-control discount_price" name="discount_price[]" readonly>
                                                     </div>
 
@@ -351,11 +337,9 @@ $(document).on('click', '.addQuantity', function () {
 });
 
 $(document).on('click', '.removeQuantity', function () {
-
     if ($('.quantity-row').length > 1) {
         $(this).closest('.quantity-row').remove();
     }
-});    // Shop related logic removed
 });
 
 
