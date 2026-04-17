@@ -24,23 +24,23 @@
                         <div class="card-body">
                             <div class="row g-4">
                                 <div class="col-xl-6">
-                                    <label for="offer_message" class="form-label">
+                                    <label for="message" class="form-label">
                                          Message <span class="text-danger">*</span>
                                     </label>
-                                    <textarea class="form-control" id="offer_message" name="offer_message" placeholder="Enter Offer Message" rows="1">{{ old('offer_message') }}</textarea>
-                                    @error('offer_message') <span class="text-danger">{{ $message }}</span> @enderror
+                                    <textarea class="form-control" id="message" name="message" placeholder="Enter Message" rows="1">{{ old('message') }}</textarea>
+                                    @error('message') <span class="text-danger">{{ $message }}</span> @enderror
                                 </div>
 
                                 <div class="col-xl-6">
-                                    <label for="offer_image" class="form-label">
+                                    <label for="notification_image" class="form-label">
                                          Image <span class="text-danger"></span>
                                     </label>
-                                    <input type="file" class="form-control" id="offer_image" name="offer_image" accept="image/*" onchange="previewImage(this)">
+                                    <input type="file" class="form-control" id="notification_image" name="notification_image" accept="image/*" onchange="previewImage(this)">
                                     <div id="image_preview_container" class="mt-2 text-center" style="display:none;">
                                         <p class="small text-muted mb-1">Image Preview</p>
-                                        <img id="offer_image_preview" src="#" alt="Offer Image" height="150" class="img-thumbnail">
+                                        <img id="notification_image_preview" src="#" alt="Notification Image" height="150" class="img-thumbnail">
                                     </div>
-                                    @error('offer_image') <span class="text-danger">{{ $message }}</span> @enderror
+                                    @error('notification_image') <span class="text-danger">{{ $message }}</span> @enderror
                                 </div>
                             </div>
                         </div>
@@ -59,7 +59,7 @@
         if (input.files && input.files[0]) {
             var reader = new FileReader();
             reader.onload = function(e) {
-                $('#offer_image_preview').attr('src', e.target.result);
+                $('#notification_image_preview').attr('src', e.target.result);
                 $('#image_preview_container').show();
             }
             reader.readAsDataURL(input.files[0]);
@@ -69,18 +69,18 @@
     $(function() {
         $("#pushNotificationForm").validate({
             rules: {
-                offer_message: {
+                message: {
                     required: true
                 },
-                // offer_image: {
+                // notification_image: {
                 //     required: true
                 // },
             },
             messages: {
-                offer_message: {
-                    required: "Please enter offer message"
+                message: {
+                    required: "Please enter message"
                 },
-                // offer_image: {
+                // notification_image: {
                 //     required: "Please upload an image"
                 // },
             },

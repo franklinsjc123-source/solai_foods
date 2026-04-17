@@ -5,7 +5,7 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\AdressController;
-use App\Http\Controllers\Api\OfferController;
+
 use App\Http\Controllers\Api\DeliveryController;
 
 use Illuminate\Http\Request;
@@ -69,8 +69,7 @@ Route::get('/OrderCancel',[OrderController::class,"OrderCancel"])->name('OrderCa
 
 
 
-Route::post('applyOffer', [OfferController::class, 'applyOffer'])->name('applyOffer');
-Route::post('removeOffer', [OfferController::class, 'removeOffer'])->name('removeOffer');
+
 
 
 

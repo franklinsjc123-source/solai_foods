@@ -6,8 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\CartItems;
 use App\Models\Product;
-use App\Models\Offers;
-use App\Models\OffersUsed;
+
 use App\Models\Address;
 use App\Models\PinCode;
 
@@ -149,32 +148,6 @@ class CartController extends Controller
             }
 
 
-            $offers = Offers::where('status', 1)
-                ->whereDate('expiry_date', '>=', Carbon::today())
-                ->whereNotIn('id', function($query) use ($user_id, $cart) {
-                    $query->select('offer_id')
-                          ->from('offer_used')
-                          ->where('user_id', $user_id)
-                          ->where('cart_id', '!=', $cart->id);
-                })
-                ->get()
-                ->map(function ($offer) use ($cart, $user_id) {
-
-                    $is_used = OffersUsed::where('offer_id', $offer->id)
-                        ->where('cart_id', $cart->id)
-                        ->where('user_id', $user_id)
-                        ->exists();
-
-                    return [
-                        'id' => $offer->id,
-                        'offer_code' => $offer->offer_code,
-                        'discount_percentage' => $offer->discount_percentage,
-                        'minimum_order_amount' => $offer->minimum_order_amount,
-                        'expiry_date' => $offer->expiry_date,
-                        'is_used' => $is_used ? 1 : 0
-                    ];
-                });
-
             $delivery_address = Address::where('user_id', $user_id)
                 ->where('is_default', 1)
                 ->first();
@@ -182,29 +155,7 @@ class CartController extends Controller
             $item_price = CartItems::where('cart_id', $cart->id)
                 ->sum('total_price');
 
-            $appliedOffers = OffersUsed::where('cart_id', $cart->id)
-                ->where('user_id', $user_id)
-                ->pluck('offer_id');
-
             $discount = 0;
-
-            foreach ($appliedOffers as $offer_id) {
-
-                $offer = Offers::find($offer_id);
-
-                if ($offer) {
-
-                    if ($item_price >= $offer->minimum_order_amount) {
-
-                        $discount += ($item_price * $offer->discount_percentage) / 100;
-                    } else {
-
-                        OffersUsed::where('offer_id', $offer_id)
-                            ->where('cart_id', $cart->id)
-                            ->delete();
-                    }
-                }
-            }
 
             $delivery_charge = 0;
 
@@ -280,11 +231,7 @@ class CartController extends Controller
 
             $cart_count = CartItems::where('cart_id', $cart->id)->count();
 
-            $applied_offer_ids = OffersUsed::where('cart_id', $cart->id)
-                ->pluck('id')
-                ->toArray();
-
-            $applied_offers = implode(',', $applied_offer_ids);
+            $applied_offers = '';
 
 
 
@@ -296,7 +243,7 @@ class CartController extends Controller
                 'delivery_charge' => $delivery_charge,
                 'discount' => number_format($discount, 2, '.', ''),
                 'final_amount' => $final_amount,
-                'offers' => $offers,
+                'offers' => [],
                 'delivery_address' => $delivery_address,
                 'data' => $response
             ]);
@@ -342,7 +289,7 @@ class CartController extends Controller
         $cart = Cart::with('items')->find($item->cart_id);
 
         if ($cart) {
-            $cart->total_amount = $cart->items->sum('total_price');
+            $cart->total_amount = $cart->items()->sum('total_price');
             $cart->save();
         }
 

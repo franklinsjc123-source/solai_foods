@@ -281,14 +281,7 @@ $today_order_count          = Order::whereDate('created_at',  Carbon::today())->
 
 
 
-                @if(auth()->check() && auth()->user()->hasPermission('Offers'))
-                   <li class="pe-slide pe-has-sub">
-                        <a href="{{ route('offers') }}" class="pe-nav-link">
-                            <i class="bi  bi-percent pe-nav-icon"></i>
-                            <span class="pe-nav-content">Offers </span>
-                        </a>
-                    </li>
-                @endif
+
 
 
 

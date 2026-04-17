@@ -17,7 +17,7 @@ use App\Http\Controllers\Backend\CustomerController;
 use App\Http\Controllers\Backend\DeliveryPersonController;
 use App\Http\Controllers\Backend\OrderController;
 
-use App\Http\Controllers\Backend\OfferController;
+
 use App\Http\Controllers\Backend\ReferralController;
 use App\Http\Controllers\Backend\ReportController;
 use App\Http\Controllers\Backend\TaxController;
@@ -140,10 +140,7 @@ Route::middleware('auth.request')->group(function () {
     Route::post('storeUpdateDeliveryPerson', [DeliveryPersonController::class, 'storeUpdateDeliveryPerson'])->name('storeUpdateDeliveryPerson');
 
 
-    // offers
-    Route::get('offers', [OfferController::class, 'offers'])->name('offers');
-    Route::get('addOffer/{id?}', [OfferController::class, 'addOffer'])->name('addOffer');
-    Route::post('storeUpdateOffer', [OfferController::class, 'storeUpdateOffer'])->name('storeUpdateOffer');
+
 
     // Push Notification
     Route::get('push-notification', [PushNotificationController::class, 'index'])->name('push-notification');

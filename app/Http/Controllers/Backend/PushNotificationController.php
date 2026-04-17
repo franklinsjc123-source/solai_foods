@@ -26,28 +26,28 @@ class PushNotificationController extends Controller
     public function sendPushNotification(Request $request)
     {
         $request->validate([
-            'offer_message' => 'required',
-            // 'offer_image'   => 'required|image'
+            'message' => 'required',
+            // 'notification_image'   => 'required|image'
         ]);
 
-        $offer_message = $request->offer_message ?? '';
-        $offer_image   = '';
+        $message = $request->message ?? '';
+        $notification_image   = '';
 
-        if ($request->hasFile('offer_image')) {
-            $imageName = time() . '.' . $request->offer_image->extension();
-            $request->offer_image->move(public_path('uploads/notifications'), $imageName);
-            $offer_image = $imageName;
+        if ($request->hasFile('notification_image')) {
+            $imageName = time() . '.' . $request->notification_image->extension();
+            $request->notification_image->move(public_path('uploads/notifications'), $imageName);
+            $notification_image = $imageName;
         }
 
         // Send to all customers (auth_level 3)
         $customers = User::where('auth_level', 3)->get();
         $title     = "New Notification - NexOcart";
-        $imageUrl  = $offer_image ? asset('uploads/notifications/' . $offer_image) : null;
+        $imageUrl  = $notification_image ? asset('uploads/notifications/' . $notification_image) : null;
 
         $sentCount = 0;
         foreach ($customers as $c) {
             if (!empty($c->token_id)) {
-                $this->sendNotification($c->id, $title, $offer_message, $imageUrl);
+                $this->sendNotification($c->id, $title, $message, $imageUrl);
                 $sentCount++;
             }
         }

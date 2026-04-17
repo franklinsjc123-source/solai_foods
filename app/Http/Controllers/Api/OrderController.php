@@ -18,8 +18,7 @@ use App\Models\Category;
 use App\Models\DeliveryPerson;
 use App\Models\PinCode;
 use App\Models\User;
-use App\Models\OffersUsed;
-use App\Models\Offers;
+
 use App\Models\DeclineOrder;
 
 use Carbon\Carbon;
@@ -261,8 +260,8 @@ class OrderController extends Controller
         $user_id            = $request->user_id;
         $delivery_id        = $request->delivery_id;
         $payment_type       = $request->payment_type;
-        $offer_applied_ids  = $request->offer_ids;
-        $discount           = $request->discount ?  $request->discount : 0;
+        $offer_applied_ids  = null;
+        $discount           = 0;
 
 
         $cart = Cart::with('items.product')->where('user_id', $user_id)->first();
@@ -519,8 +518,8 @@ class OrderController extends Controller
 
         $user_id     = $request->user_id;
         $delivery_id = $request->delivery_id;
-        $discount    = $request->discount ?? 0;
-        $offer_ids   = $request->offer_ids;
+        $discount    = 0;
+        $offer_ids   = null;
 
         $cart = Cart::with('items.product')->where('user_id', $user_id)->first();
 
