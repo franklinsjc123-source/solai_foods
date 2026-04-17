@@ -7,7 +7,7 @@ use App\Models\Shop;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\OrderItems;
-use App\Models\DirectOrder;
+
 use App\Models\DeliveryPerson;
 use App\Models\Product;
 
@@ -24,8 +24,7 @@ class DashboardController extends Controller
         $order_count                = Order::count();
         $product_count              = Product::count();
         $today_order_count          = Order::whereDate('created_at',  Carbon::today())->count();
-        $direct_order_count         = DirectOrder::count();
-        $today_direct_order_count   = DirectOrder::whereDate('created_at',  Carbon::today())->count();
+
         $delivert_person_count      = DeliveryPerson::where('status', 1)->count();
         $shop_count                 = 0; // Removed shop concept
 
@@ -50,7 +49,7 @@ class DashboardController extends Controller
         }
 
 
-        return view('backend.dashboard', compact('customer_count', 'order_count', 'delivert_person_count', 'direct_order_count', 'today_direct_order_count', 'today_order_count', 'categoryLabels', 'shopCounts', 'productCounts', 'product_count', 'shop_count'));
+        return view('backend.dashboard', compact('customer_count', 'order_count', 'delivert_person_count', 'today_order_count', 'categoryLabels', 'shopCounts', 'productCounts', 'product_count', 'shop_count'));
     }
 
     public function privacy_policy()
@@ -86,29 +85,23 @@ class DashboardController extends Controller
             return response()->json(['status' => 'no_access']);
         }
 
-        $last_direct_id = $request->input('last_direct_id', 0);
         $last_order_id = $request->input('last_order_id', 0);
         
-        $direct_query = DirectOrder::query();
         $order_query = Order::query();
 
-        if ($last_direct_id == -1 || $last_order_id == -1) {
+        if ($last_order_id == -1) {
             return response()->json([
                 'status' => 'init', 
-                'latest_direct_id' => $direct_query->max('id') ?? 0,
                 'latest_order_id' => $order_query->max('id') ?? 0
             ]);
         }
 
-        $new_direct = $direct_query->where('id', '>', $last_direct_id)->get();
         $new_orders = $order_query->where('id', '>', $last_order_id)->get();
 
-        if ($new_direct->count() > 0 || $new_orders->count() > 0) {
+        if ($new_orders->count() > 0) {
             return response()->json([
                 'status' => 'new', 
-                'latest_direct_id' => $new_direct->max('id') ?? $last_direct_id,
                 'latest_order_id' => $new_orders->max('id') ?? $last_order_id,
-                'direct_count' => $new_direct->count(),
                 'order_count' => $new_orders->count()
             ]);
         }

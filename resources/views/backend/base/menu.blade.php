@@ -2,11 +2,10 @@
 
 use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
-use App\Models\DirectOrder;
+
 use Carbon\Carbon;
 
 $today_order_count          = Order::whereDate('created_at',  Carbon::today())->count();
-$today_direct_order_count   = DirectOrder::whereDate('created_at',  Carbon::today())->count();
 
 
 ?>
@@ -82,19 +81,6 @@ $today_direct_order_count   = DirectOrder::whereDate('created_at',  Carbon::toda
                                 </div>
 
 
-
-                                <div class="noti-item">
-
-                                    <div>
-                                        <a href="javascript:void(0)" class="stretched-link">
-                                            <h6 class="mb-1 text-muted"> Direct Orders &nbsp;&nbsp;&nbsp;   <span id="direct-order-badge" class="badge bg-success rounded-circle align-middle ms-1"><?=  $today_direct_order_count ?></span> </h6>
-                                        </a>
-                                    </div>
-                                        {{-- <a href="javascript:void(0)"
-                                            class="position-absolute top-10 end-0 fs-18 z-1 link link-danger"><i
-                                                class="bi bi-x"></i>
-                                        </a> --}}
-                                </div>
 
                             </div>
                         </div>
@@ -334,16 +320,7 @@ $today_direct_order_count   = DirectOrder::whereDate('created_at',  Carbon::toda
                             </li>
                         @endif
 
-                        @if(auth()->check() && auth()->user()->hasPermission('Direct-Order'))
 
-
-                            <li class="pe-slide-item">
-                                <a href="<?= route('direct-orders') ?>" class="pe-nav-link
-                                        @if(request()->routeIs(['direct-orders'])) active @endif">
-                                    Direct  Orders
-                                </a>
-                            </li>
-                        @endif
 
 
 
@@ -522,12 +499,7 @@ $today_direct_order_count   = DirectOrder::whereDate('created_at',  Carbon::toda
                             </li>
 
 
-                            <li class="pe-slide-item">
-                                <a href="<?= route('direct-orders-report') ?>" class="pe-nav-link
-                                        @if(request()->routeIs(['direct-orders-report'])) active @endif">
-                                    Direct Order Report
-                                </a>
-                            </li>
+
 
 
                     </ul>

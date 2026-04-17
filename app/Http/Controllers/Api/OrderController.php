@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\DirectOrder;
+
 use App\Models\Company;
 
 use Razorpay\Api\Api;
@@ -11,7 +11,7 @@ use App\Models\Cart;
 use App\Models\CartItems;
 use App\Models\Order;
 use App\Models\OrderItems;
-use App\Models\Shop;
+
 use App\Models\Invoice;
 use App\Models\Address;
 use App\Models\Category;
@@ -54,19 +54,7 @@ class OrderController extends Controller
             )
             ->get();
 
-        $directOrders = DirectOrder::where('customer_id', $user_id)
-            ->select(
-                'id',
-                'invoice_no',
-                'total_invoice_amount',
-                'order_status',
-                'image_url',
-                'created_at'
-            )
-            ->get();
-
-        $allOrders = $orders->concat($directOrders)
-            ->sortByDesc('created_at')
+        $allOrders = $orders->sortByDesc('created_at')
             ->values();
 
         if ($allOrders->isEmpty()) {
@@ -78,40 +66,24 @@ class OrderController extends Controller
 
         $data = $allOrders->map(function ($order) {
 
-            if (isset($order->order_id)) {
+            $is_dispatched = 0;
 
-                $is_dispatched = 0;
-
-                if ($order->shopInvoices && $order->shopInvoices->count() > 0) {
-                    $is_dispatched = $order->shopInvoices->contains('is_dispatched', 1) ? 1 : 0;
-                }
-
-                return [
-                    'id' => $order->id,
-                    'order_id' => $order->order_id,
-                    'shop_name' => 'Solai Foods',
-                    'amount' => number_format($order->amount + $order->ship_amount, 2, '.', ''),
-                    'order_status' => $order->order_status,
-                    'is_dispatched' => $is_dispatched,
-                    'payment_type' => $order->payment_type,
-                    'image_url' => '',
-                    'order_type' => 'cart_order',
-                    'date' => $order->created_at ? date('d-m-Y h:i a', strtotime($order->created_at)) : '',
-                ];
-            } else {
-
-                return [
-                    'id' => $order->id,
-                    'order_id' => $order->invoice_no,
-                    'shop_name' => 'Solai Foods',
-                    'amount' => number_format($order->total_invoice_amount, 2, '.', ''),
-                    'order_status' => $order->order_status,
-                    'payment_type' => 'Cash on Delivery',
-                    'image_url' => $order->image_url,
-                    'order_type' => 'direct_order',
-                    'date' => $order->created_at ? date('d-m-Y h:i a', strtotime($order->created_at)) : '',
-                ];
+            if ($order->shopInvoices && $order->shopInvoices->count() > 0) {
+                $is_dispatched = $order->shopInvoices->contains('is_dispatched', 1) ? 1 : 0;
             }
+
+            return [
+                'id' => $order->id,
+                'order_id' => $order->order_id,
+                'shop_name' => 'Solai Foods',
+                'amount' => number_format($order->amount + $order->ship_amount, 2, '.', ''),
+                'order_status' => $order->order_status,
+                'is_dispatched' => $is_dispatched,
+                'payment_type' => $order->payment_type,
+                'image_url' => '',
+                'order_type' => 'cart_order',
+                'date' => $order->created_at ? date('d-m-Y h:i a', strtotime($order->created_at)) : '',
+            ];
         });
 
         return response()->json([
@@ -278,62 +250,7 @@ class OrderController extends Controller
 
 
 
-    public function placeDirectOrder(Request $request)
-    {
-        $customer_id = $request->input('customer_id');
-        $delivery_id = $request->input('delivery_id');
 
-        $now = Carbon::now('Asia/Kolkata')->format('d-m-Y h:i A');
-
-        if ($customer_id != '') {
-
-            if ($request->hasFile('order_image')) {
-                $file = $request->file('order_image');
-                $imageName = 'direct_order_' . time() . '_' . preg_replace('/\s+/', '_', $file->getClientOriginalName());
-                $file->move(public_path('uploads/direct_order'), $imageName);
-                $imageUrl = url('uploads/direct_order/' . $imageName);
-            }
-
-            $company_details =  Company::orderBy('id', 'asc')->first();
-            $currentInvoice = $company_details->direct_invoice_no;
-
-            $insertArray = array(
-                'customer_id'      => $customer_id,
-                'delivery_id'      => $delivery_id,
-                'invoice_no'       => $currentInvoice,
-                'image_url'        => $imageUrl,
-                'created_at'       =>  $now,
-
-            );
-
-            $order = DirectOrder::create($insertArray);
-
-            if ($order) {
-
-                $currentInvoice = $company_details->direct_invoice_no ?? 'NCD-0000';
-
-                $number = (int) str_replace('NCD-', '', $currentInvoice);
-
-                $nextNumber = $number + 1;
-
-                $nextInvoice = 'NCD-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
-
-                $company_details->update([
-                    'direct_invoice_no' => $nextInvoice
-                ]);
-
-                $success_array = array('status' => 'success', 'message' => 'Order placed successfully');
-                return response()->json(array($success_array), 200);
-            } else {
-
-                $error_array = array('status' => 'error', 'message' => 'Order not placed');
-                return response()->json(array($error_array), 400);
-            }
-        } else {
-            $error_array = array('status' => 'error', 'message' => 'Parameters Missing');
-            return response()->json(array($error_array), 400);
-        }
-    }
 
 
 

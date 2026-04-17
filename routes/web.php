@@ -16,7 +16,7 @@ use App\Http\Controllers\Backend\UnitController;
 use App\Http\Controllers\Backend\CustomerController;
 use App\Http\Controllers\Backend\DeliveryPersonController;
 use App\Http\Controllers\Backend\OrderController;
-use App\Http\Controllers\Backend\DirectOrderController;
+
 use App\Http\Controllers\Backend\OfferController;
 use App\Http\Controllers\Backend\ReferralController;
 use App\Http\Controllers\Backend\ReportController;
@@ -131,13 +131,7 @@ Route::middleware('auth.request')->group(function () {
     Route::post('/get-order-items', [OrderController::class, 'getOrderItems']);
 
 
-    //direct orders Management
-    Route::get("direct-orders", [DirectOrderController::class, 'directOrders'])->name('direct-orders');
-    Route::match(['get', 'post'], "direct-order-abstract", [DirectOrderController::class, 'directOrdersAbstract'])->name('direct-order-abstract');
-    Route::post('/abstract/download', [DirectOrderController::class, 'storeDirectOrdersAbstract'])->name('abstract.download');
-    Route::get("addDirectOrderBill/{id}", [DirectOrderController::class, 'addDirectOrderBill'])->name('addDirectOrderBill');
-    Route::post('direct-orders-status-update', [DirectOrderController::class, 'updateOrderStatus'])->name('direct-orders-status-update');
-    Route::post('storeUpdateDirectOrder', [DirectOrderController::class, 'storeUpdateDirectOrder'])->name('storeUpdateDirectOrder');
+
 
 
     //Delivery Person Management
@@ -157,5 +151,5 @@ Route::middleware('auth.request')->group(function () {
 
     //Report Management
     Route::match(['get', 'post'], "orders-report", [ReportController::class, 'ordersReport'])->name('orders-report');
-    Route::match(['get', 'post'], "direct-orders-report", [ReportController::class, 'directOrdersReport'])->name('direct-orders-report');
+
 });

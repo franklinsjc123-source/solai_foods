@@ -59,7 +59,7 @@ Route::get('/home-page',[HomeController::class,"getHomePageDetails"])->name('hom
 Route::get('/productDetail',[HomeController::class,"productDetail"])->name('productDetail');
 
 
-Route::post('/placeDirectOrder',[OrderController::class,"placeDirectOrder"])->name('placeDirectOrder');
+
 Route::post('/placeOrder',[OrderController::class,"placeOrder"])->name('placeOrder');
 Route::get('/getAllOrders',[OrderController::class,"getAllOrders"])->name('getAllOrders');
 Route::get('/getOrderDetails',[OrderController::class,"getOrderDetails"])->name('getOrderDetails');

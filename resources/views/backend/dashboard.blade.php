@@ -106,24 +106,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-6 col-xl-4 col-xxl-4">
-                    <div class="card card-h-100 IntelligenceGradient text-white">
-                        <a href="{{ route('direct-orders') }}">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between gap-5 mb-5">
-                                    <div>
-                                        <h4 class="text-white mb-1">Total Direct Orders</h4>
-                                    </div>
-                                    <div class="flex-shrink-0">
-                                        <div
-                                            class="h-48px w-48px bg-white fs-5 rounded d-flex justify-content-center align-items-center text-black fw-semibold">
-                                        {{ $direct_order_count ?? 0  }}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
+
 
                 <div class="col-md-6 col-xl-4 col-xxl-4">
                     <div class="card card-h-100 datascienceGradient text-white">
@@ -145,48 +128,12 @@
                     </div>
                 </div>
 
-                <div class="col-md-6 col-xl-4 col-xxl-4">
-                    <div class="card card-h-100 webGradient text-white">
-                        <a href="{{ route('direct-orders') }}">
-                        <div class="card-body">
-
-                            <div class="d-flex justify-content-between gap-5 mb-5">
-                                <div>
-                                    <h4 class="text-white mb-1">Today  Direct Orders </h4>
-                                </div>
-                                <div class="flex-shrink-0">
-                                    <div
-                                        class="h-48px w-48px bg-white fs-5 rounded d-flex justify-content-center align-items-center text-black fw-semibold">{{ $today_direct_order_count ?? 0  }}</div>
-                                </div>
-                            </div>
-
-                        </div>
-                        </a>
-                    </div>
-                </div>
 
 
 
 
-                    <div class="col-md-6 col-xl-4 col-xxl-4">
-                        <div class="card card-h-100 IntelligenceGradient text-white">
-                            <a href="{{ route('shop') }}">
-                            <div class="card-body">
 
-                                <div class="d-flex justify-content-between gap-5 mb-5">
-                                    <div>
-                                        <h4 class="text-white mb-1">Total Shops</h4>
-                                    </div>
-                                    <div class="flex-shrink-0">
-                                        <div
-                                            class="h-48px w-48px bg-white fs-5 rounded d-flex justify-content-center align-items-center text-black fw-semibold"> {{ $shop_count  ?? 0 }} </div>
-                                    </div>
-                                </div>
 
-                            </div>
-                            </a>
-                        </div>
-                    </div>
 
 
                     <div class="col-md-6 col-xl-4 col-xxl-4">
@@ -266,17 +213,10 @@
                     <div class="row">
                         {{-- <div class="col-md-1"></div> --}}
 
-                        <div class="col-md-6">
-                            <h5  style="margin-left:-90px" >Shops Based on Category</h5>
+                        <div class="col-md-12">
+                            <h5  style="margin-left:-90px" >Products Based on Category</h5>
                             <div  style="cursor:pointer" class="chart-box">
                                 <canvas id="categoryPieChart"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6 mt-1">
-                            <h5 style="margin-left:-100px" >Order and Direct Orders</h5>
-                            <div  style="cursor:pointer" class="chart-box">
-                                <canvas id="orderPieChart"></canvas>
                             </div>
                         </div>
 
@@ -301,7 +241,7 @@ new Chart(ctx, {
     data: {
         labels: {!! json_encode($categoryLabels) !!},
         datasets: [{
-            data: {!! json_encode($shopCounts) !!},
+            data: {!! json_encode($productCounts) !!},
             backgroundColor: [
                 '#FF6384',
                 '#36A2EB',
@@ -326,7 +266,6 @@ new Chart(ctx, {
                         var index = context.dataIndex;
 
                         return [
-                            "Shops: " + shopCounts[index],
                             "Products: " + productCounts[index]
                         ];
                     }
@@ -339,40 +278,7 @@ new Chart(ctx, {
     }
 });
 
-   var orderCtx = document.getElementById('orderPieChart').getContext('2d');
 
-new Chart(orderCtx, {
-    type: 'pie',
-    data: {
-        labels: ['Orders', 'Direct Orders'],
-        datasets: [{
-            data: [
-                {{ $order_count }},
-                {{ $direct_order_count }}
-            ],
-            backgroundColor: [
-                '#36A2EB',
-                '#FF6384'
-            ]
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            tooltip: {
-                callbacks: {
-                    label: function(context) {
-                        return context.label + ": " + context.raw;
-                    }
-                }
-            },
-            legend: {
-                position: 'right'  // 👈 Vertical legend
-            }
-        }
-    }
-});
 
 
 </script>

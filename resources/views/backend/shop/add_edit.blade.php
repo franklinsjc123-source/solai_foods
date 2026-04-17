@@ -49,7 +49,7 @@
                              <div class="card-header">
                                  <h5 class="mb-0"><?= $type ?> Shop </h5>
                                  <div class="float-end">
-                                     <a href="<?= route('shop') ?>" class="btn btn-primary">Back</a>
+                                     <a href="<?= route('dashboard') ?>" class="btn btn-primary">Back</a>
                                  </div>
                              </div>
 

@@ -99,7 +99,6 @@ class ShopController extends Controller
             'user_id'       => $user_id,
             'shop_name'     => $shop_name,
             'contact_no'    => $contact_no,
-            'contact_no'    => $contact_no,
             'start_time'    => $start_time,
             'end_time'      => $end_time,
             'gst_no'        => $gst_no,
@@ -113,7 +112,7 @@ class ShopController extends Controller
             $insert = Shop::create($data);
 
             return redirect()
-                ->route('shop')
+                ->route('dashboard')
                 ->with(
                     $insert ? 'success' : 'error',
                     $insert ? 'Shop Saved Successfully' : 'Something went wrong!'
@@ -122,6 +121,6 @@ class ShopController extends Controller
 
         Shop::where('id', $id)->update($data);
 
-        return redirect()->route('shop')->with('success', 'Shop Updated Successfully');
+        return redirect()->route('dashboard')->with('success', 'Shop Updated Successfully');
     }
 }
