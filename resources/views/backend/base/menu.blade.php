@@ -1,0 +1,616 @@
+<?php
+
+use Illuminate\Support\Facades\Auth;
+use App\Models\Order;
+use App\Models\DirectOrder;
+use Carbon\Carbon;
+
+$today_order_count          = Order::whereDate('created_at',  Carbon::today())->count();
+$today_direct_order_count   = DirectOrder::whereDate('created_at',  Carbon::today())->count();
+
+
+?>
+<!-- begin::App -->
+<div id="layout-wrapper">
+    <!-- Begin Header -->
+    <header class="app-header" id="appHeader">
+        <div class="container-fluid w-100">
+            <div class="d-flex align-items-center">
+                <div class="me-auto">
+                    <div class="d-inline-flex align-items-center gap-5">
+                        <a href="<?= route('dashboard') ?>" class="fs-18 fw-semibold">
+                            <img height="60" class="header-sidebar-logo-default d-none" alt="Logo"
+                                src="<?= asset('backend_assets') ?>/images/logo.jpg">
+                            <img height="60" class="header-sidebar-logo-light d-none" alt="Logo"
+                                src="<?= asset('backend_assets') ?>/images/logo.jpg">
+                            <img height="60" class="header-sidebar-logo-small d-none" alt="Logo"
+                                src="<?= asset('backend_assets') ?>/images/logo.jpg">
+                            <img height="60" class="header-sidebar-logo-small-light d-none" alt="Logo"
+                                src="<?= asset('backend_assets') ?>/images/logo.jpg">
+                        </a>
+
+                        <button type="button"
+                            class="horizontal-toggle btn btn-light-light text-muted icon-btn fs-5 rounded-pill d-none"
+                            id="toggleHorizontal">
+                            <i class="ri-menu-2-line header-icon"></i>
+                        </button>
+
+                    </div>
+                </div>
+                <div class="flex-shrink-0 d-flex align-items-center gap-1">
+
+
+                <span id="currentTime" style="font-size: 18px; font-weight: bold; margin-right:10px"></span>
+
+
+                    {{-- <div class="dark-mode-btn" id="toggleMode">
+                        <button class="btn header-btn active" id="lightModeBtn">
+                            <i class="bi bi-brightness-high"></i>
+                        </button>
+                        <button class="btn header-btn" id="darkModeBtn">
+                            <i class="bi bi-moon-stars"></i>
+                        </button>
+                    </div> --}}
+
+                    <?php  if(Auth::user()->auth_level  != 4 ) {  ?>
+
+
+                    <div class="dropdown pe-dropdown-mega d-none d-md-block">
+                        <button class="btn header-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-bell"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-mega-md header-dropdown-menu pe-noti-dropdown-menu p-0">
+                            <div class="p-3 border-bottom">
+                                <h6 class="d-flex align-items-center mb-0">Notification
+
+                                </h6>
+                            </div>
+                            <div class="p-3">
+
+                                <div class="noti-item">
+
+                                    <div>
+                                        <a href="javascript:void(0)" class="stretched-link">
+                                            <h6 class="mb-1 text-muted"> Orders  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span id="order-badge" class="badge bg-success rounded-circle align-middle ms-1"><?= $today_order_count ?></span> </h6>
+                                        </a>
+
+                                    </div>
+                                    {{-- <a href="javascript:void(0)"
+                                        class="position-absolute top-10 end-0 fs-18 z-1 link link-danger"><i
+                                            class="bi bi-x"></i>
+                                    </a> --}}
+                                </div>
+
+
+
+                                <div class="noti-item">
+
+                                    <div>
+                                        <a href="javascript:void(0)" class="stretched-link">
+                                            <h6 class="mb-1 text-muted"> Direct Orders &nbsp;&nbsp;&nbsp;   <span id="direct-order-badge" class="badge bg-success rounded-circle align-middle ms-1"><?=  $today_direct_order_count ?></span> </h6>
+                                        </a>
+                                    </div>
+                                        {{-- <a href="javascript:void(0)"
+                                            class="position-absolute top-10 end-0 fs-18 z-1 link link-danger"><i
+                                                class="bi bi-x"></i>
+                                        </a> --}}
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <?php  } ?>
+                    <?php
+                    use App\Models\Company;
+
+                    $company_data = Company::first();
+                    ?>
+
+
+                    <div class="dropdown pe-dropdown-mega d-none d-md-block">
+                        <button class="header-profile-btn btn gap-1 text-start" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="header-btn btn position-relative">
+                                <img src="<?=   $company_data->logo ?>" alt=""
+                                    class="img-fluid rounded-circle">
+                                <span
+                                    class="position-absolute translate-middle badge border border-light rounded-circle bg-success"><span
+                                        class="visually-hidden">unread messages</span></span>
+                            </span>
+                            <div class="d-none d-lg-block pe-2">
+                                <span class="d-block mb-0 fs-13 fw-semibold"><?= $company_data->company_name  ?> </span>
+
+                            </div>
+                        </button>
+                        <div class="dropdown-menu dropdown-mega-sm header-dropdown-menu p-3">
+                            <div class="border-bottom pb-2 mb-2 d-flex align-items-center gap-2">
+                                <img src="<?= asset('backend_assets') ?>/images/avatar/avatar-10.jpg" alt=""
+                                    class="avatar-md">
+                                <div>
+                                    <a href="javascript:void(0)">
+                                        <h6 class="mb-0 lh-base"><?= Auth::user()->name ?> </h6>
+                                    </a>
+                                    <p class="mb-0 fs-13 text-muted"><?= Auth::user()->email ?></p>
+                                </div>
+                            </div>
+                            <ul class="list-unstyled mb-1 border-bottom pb-1">
+                                <li><a class="dropdown-item" href="<?= route('profile') ?>"><i
+                                            class="bi bi-person me-1"></i> View Profile</a></li>
+                                <?php  if(Auth::user()->auth_level  == 1 ) {  ?>
+                                    {{-- <li><a class="dropdown-item" href="<?= route('assign-permission') ?>"><i class="bi bi-lock me-1"></i> Assign Permission</a></li> --}}
+                                <?php  } ?>
+                                <!-- <li><a class="dropdown-item" href="javascript:void(0)"><i class="bi bi-award me-1"></i> Subscription</a></li> -->
+                            </ul>
+                            <!-- <ul class="list-unstyled mb-1 border-bottom pb-1">
+                                <li><a class="dropdown-item" href="javascript:void(0)"><i class="bi bi-clock me-1"></i> ChangLog</a></li>
+                                <li><a class="dropdown-item" href="javascript:void(0)"><i class="bi bi-people me-1"></i> Team</a></li>
+                                <li><a class="dropdown-item" href="javascript:void(0)"><i class="bi bi-headset me-1"></i> Support</a></li>
+                            </ul> -->
+                            <ul class="list-unstyled mb-0">
+                                <li><a class="dropdown-item" href="<?= route('logout') ?> "><i
+                                            class="bi bi-box-arrow-right me-1"></i> Sign Out</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+      <button class="btn d-lg-none ms-2" id="mobileMenuBtn">
+    <i class="ri-menu-line fs-22"></i>
+</button>
+    </header>
+
+    <style>
+
+
+
+    </style>
+
+    <!-- END Header -->
+
+
+    <aside class="pe-app-sidebar" id="sidebar">
+        <div class="pe-app-sidebar-logo  d-flex align-items-center position-relative">
+            <!--begin::Brand Image-->
+            <a href="<?= route('dashboard') ?>" class="fs-18 fw-semibold">
+                <img style="height:73px; width:238px" width="100%" class="pe-app-sidebar-logo-default d-none" alt="Logo"
+                    src="<?= asset('backend_assets') ?>/images/logo.jpg">
+                <img height="60" class="pe-app-sidebar-logo-light d-none" alt="Logo"
+                    src="<?= asset('backend_assets') ?>/images/logo.jpg">
+                <img height="60" class="pe-app-sidebar-logo-minimize d-none" alt="Logo"
+                    src="<?= asset('backend_assets') ?>/images/logo.jpg">
+                <img height="60" class="pe-app-sidebar-logo-minimize-light d-none" alt="Logo"
+                    src="<?= asset('backend_assets') ?>/images/logo.jpg">
+                <!-- FabKin -->
+            </a>
+            <!--end::Brand Image-->
+        </div>
+        <nav class="pe-app-sidebar-menu nav nav-pills" data-simplebar id="sidebar-simplebar">
+            <ul class="pe-main-menu list-unstyled">
+
+                <li class="pe-slide pe-has-sub">
+                    <a href="<?= route('dashboard') ?>" class="pe-nav-link">
+                        <i class="  bi bi-house-door-fill pe-nav-icon"></i>
+                        <span class="pe-nav-content">Dashboards </span>
+                    </a>
+                </li>
+
+
+
+
+                @php
+                    $showProduct =
+                        auth()->check() && (
+                            auth()->user()->hasPermission('Category') ||
+                            auth()->user()->hasPermission('Product') ||
+                            auth()->user()->hasPermission('Unit') ||
+                            auth()->user()->hasPermission('Tax') ||
+                            auth()->user()->hasPermission('Product-Upload') ||
+                            Auth::user()->auth_level == 1
+                        );
+                @endphp
+
+                @if($showProduct)
+
+                    <li class="pe-slide pe-has-sub">
+
+                        <a href="#collapseLogistics-mas" class="pe-nav-link" data-bs-toggle="collapse"
+                            aria-expanded="false"
+                            aria-controls="collapseLogistics">
+                            <i class="bi bi-bag-fill pe-nav-icon"></i>
+                            <span class="pe-nav-content">Product Master</span>
+                            <i class="ri-arrow-down-s-line pe-nav-arrow"></i>
+                        </a>
+
+                        <ul class="pe-slide-menu collapse " id="collapseLogistics-mas">
+
+                            <li class="slide pe-nav-content1">
+                                <a href="javascript:void(0)">Product Masters</a>
+                            </li>
+
+                            @if(auth()->check() && auth()->user()->hasPermission('Category'))
+                                <li class="pe-slide-item">
+                                    <a href="<?= route('category') ?>" class="pe-nav-link
+                                            @if(request()->routeIs(['category', 'addCategory'])) active @endif">
+                                        Category
+                                    </a>
+                                </li>
+                            @endif
+
+
+
+
+
+                            @if(auth()->check() && auth()->user()->hasPermission('Product'))
+                            <li class="pe-slide-item">
+                                <a href="<?= route('product') ?>" class="pe-nav-link
+                                    @if(request()->routeIs(['product', 'addProduct'])) active @endif">
+                                    Product
+                                </a>
+                            </li>
+                            @endif
+
+                            @if(auth()->check() && auth()->user()->hasPermission('Unit'))
+                                <li class="pe-slide-item">
+                                    <a href="<?= route('unit') ?>" class="pe-nav-link
+                                            @if(request()->routeIs(['unit', 'addUnit'])) active @endif">
+                                        Unit
+                                    </a>
+                                </li>
+                            @endif
+
+
+
+                            @if(auth()->check() && auth()->user()->hasPermission('Tax'))
+                                <li class="pe-slide-item">
+                                    <a href="<?= route('tax') ?>" class="pe-nav-link
+                                            @if(request()->routeIs(['tax', 'addTax'])) active @endif">
+                                        Tax
+                                    </a>
+                                </li>
+                            @endif
+
+
+
+                            @if(auth()->check() && auth()->user()->hasPermission('Product-Upload'))
+                            <li class="pe-slide-item">
+                                <a href="<?= route('product-upload') ?>" class="pe-nav-link
+                                    @if(request()->routeIs(['product-upload'])) active @endif">
+                                    Product Upload
+                                </a>
+                            </li>
+
+
+                            @endif
+
+
+
+
+                        </ul>
+                    </li>
+
+                @endif
+
+
+
+                @if(auth()->check() && auth()->user()->hasPermission('Offers'))
+                   <li class="pe-slide pe-has-sub">
+                        <a href="{{ route('offers') }}" class="pe-nav-link">
+                            <i class="bi  bi-percent pe-nav-icon"></i>
+                            <span class="pe-nav-content">Offers </span>
+                        </a>
+                    </li>
+                @endif
+
+
+
+
+
+
+                  <li class="pe-slide pe-has-sub">
+
+                    <a href="#collapseLogistics-order" class="pe-nav-link" data-bs-toggle="collapse"
+                        aria-expanded="false"
+                        aria-controls="collapseLogistics">
+                        <i class="bi bi-bag-fill pe-nav-icon"></i>
+                        <span class="pe-nav-content"> Orders</span>
+                        <i class="ri-arrow-down-s-line pe-nav-arrow"></i>
+                    </a>
+
+                    <ul class="pe-slide-menu collapse " id="collapseLogistics-order">
+
+                        <li class="slide pe-nav-content1">
+                            <a href="javascript:void(0)">Orders </a>
+                        </li>
+
+                        @if(auth()->check() && auth()->user()->hasPermission('Orders'))
+                            <li class="pe-slide-item">
+                                <a href="<?= route('orders') ?>" class="pe-nav-link
+                                        @if(request()->routeIs(['orders'])) active @endif">
+                                    Orders
+                                </a>
+                            </li>
+                        @endif
+
+                        @if(auth()->check() && auth()->user()->hasPermission('Direct-Order'))
+
+
+                            <li class="pe-slide-item">
+                                <a href="<?= route('direct-orders') ?>" class="pe-nav-link
+                                        @if(request()->routeIs(['direct-orders'])) active @endif">
+                                    Direct  Orders
+                                </a>
+                            </li>
+                        @endif
+
+
+
+                    </ul>
+                </li>
+
+
+
+                     @if(auth()->check() && auth()->user()->hasPermission('Customers'))
+                    <li class="pe-slide pe-has-sub">
+                        <a href="{{ route('customers') }}" class="pe-nav-link">
+                            <i class="bi bi-person-fill pe-nav-icon"></i>
+                            <span class="pe-nav-content">Customers </span>
+                        </a>
+                    </li>
+                @endif
+
+                @if(auth()->check() && auth()->user()->hasPermission('Delivery-Persons'))
+
+                   <li class="pe-slide pe-has-sub">
+                    <a href="{{ route('deliveryPerson') }}" class="pe-nav-link">
+                        <i class="bi bi-person-fill pe-nav-icon"></i>
+                        <span class="pe-nav-content">Delivery Person </span>
+                    </a>
+                </li>
+                @endif
+
+
+                    @if(auth()->check() && auth()->user()->hasPermission('Referral'))
+
+                   <li class="pe-slide pe-has-sub">
+                    <a href="{{ route('referral') }}" class="pe-nav-link">
+                        <i class="bi  bi-ticket-detailed pe-nav-icon"></i>
+                        <span class="pe-nav-content">Referral </span>
+                    </a>
+                </li>
+                @endif
+
+                @if(auth()->check() && in_array(Auth::user()->auth_level, [1, 2]))
+                   <li class="pe-slide pe-has-sub">
+                        <a href="{{ route('push-notification') }}" class="pe-nav-link @if(request()->routeIs(['push-notification'])) active @endif">
+                            <i class="bi bi-bell-fill pe-nav-icon"></i>
+                            <span class="pe-nav-content">Push Notification </span>
+                        </a>
+                    </li>
+                @endif
+
+
+
+                @php
+                    $showSettings =
+                        auth()->check() && (
+                            auth()->user()->hasPermission('Company-Settings') ||
+                            auth()->user()->hasPermission('Pincode') ||
+                            auth()->user()->hasPermission('Slider') ||
+                            auth()->user()->hasPermission('User-Management') ||
+                            auth()->user()->hasPermission('permission') ||
+                            Auth::user()->auth_level == 1
+                        );
+                @endphp
+
+                @if($showSettings)
+
+                    <li class="pe-slide pe-has-sub active">
+
+                        <a href="#collapseLogistics" class="pe-nav-link" data-bs-toggle="collapse"
+                            aria-expanded="true"
+                            aria-controls="collapseLogistics">
+                            <i class="bi bi-gear-fill pe-nav-icon"></i>
+                            <span class="pe-nav-content">Settings</span>
+                            <i class="ri-arrow-down-s-line pe-nav-arrow"></i>
+                        </a>
+
+                        <ul class="pe-slide-menu collapse " id="collapseLogistics">
+
+                            <li class="slide pe-nav-content1">
+                                <a href="javascript:void(0)">Settings</a>
+                            </li>
+
+                            @if(auth()->check() && auth()->user()->hasPermission('Company-Settings'))
+                                <li class="pe-slide-item">
+                                    <a href="<?= route('company') ?>" class="pe-nav-link
+                                            @if(request()->routeIs(['company', 'addCompany'])) active @endif">
+                                        Company Setttings
+                                    </a>
+                                </li>
+                            @endif
+
+
+                            @if(auth()->check() && auth()->user()->hasPermission('Pincode'))
+
+                            <li class="pe-slide-item">
+                                <a href="<?= route('pincode') ?>" class="pe-nav-link
+                                        @if(request()->routeIs(['pincode', 'addPincode'])) active @endif">
+                                    Pincode
+                                </a>
+                            </li>
+                            @endif
+
+                            @if(auth()->check() && auth()->user()->hasPermission('Slider'))
+
+                            <li class="pe-slide-item">
+                                <a href="<?= route('slider') ?>" class="pe-nav-link
+                                        @if(request()->routeIs(['slider', 'addSlider'])) active @endif">
+                                    Slider
+                                </a>
+                            </li>
+                            @endif
+
+
+                            @if(auth()->check() && auth()->user()->hasPermission('User-Management'))
+                                <li class="pe-slide-item">
+                                    <a href="<?= route('users') ?>" class="pe-nav-link
+                                            @if(request()->routeIs(['user', 'addUser'])) active @endif">
+                                        User Management
+                                    </a>
+                                </li>
+                            @endif
+
+                            @if(auth()->check() && auth()->user()->hasPermission('permission'))
+                            <li class="pe-slide-item">
+                                <a href="<?= route('permission') ?>" class="pe-nav-link
+                                        @if(request()->routeIs(['permission', 'addPermission'])) active @endif">
+                                    Permission
+                                </a>
+                            </li>
+                            @endif
+
+                        <?php  if(Auth::user()->auth_level  == 1 ) {  ?>
+                            <li class="pe-slide-item">
+                                <a href="<?= route('assign-permission') ?>" class="pe-nav-link
+                                        @if(request()->routeIs(['assign-permission'])) active @endif">
+                                Assign Permission
+                                </a>
+                            </li>
+
+                            <li class="pe-slide-item">
+                                <a href="{{ route('assign-permission', ['type' => 'shop']) }}"
+                                class="pe-nav-link {{ request()->get('type') == 'shop' ? 'active' : '' }}">
+                                Assign Permission Shop
+                                </a>
+                            </li>
+                        <?php } ?>
+
+                        </ul>
+                    </li>
+
+                @endif
+
+
+
+                @if(auth()->check() && auth()->user()->hasPermission('Reports'))
+
+                <li class="pe-slide pe-has-sub">
+
+                    <a href="#collapseLogistics-report" class="pe-nav-link" data-bs-toggle="collapse"
+                        aria-expanded="false"
+                        aria-controls="collapseLogistics">
+                        <i class="bi bi-file-earmark  pe-nav-icon"></i>
+                        <span class="pe-nav-content"> Reports</span>
+                        <i class="ri-arrow-down-s-line pe-nav-arrow"></i>
+                    </a>
+
+                    <ul class="pe-slide-menu collapse " id="collapseLogistics-report">
+
+                        <li class="slide pe-nav-content1">
+                            <a href="javascript:void(0)">Reports </a>
+                        </li>
+
+
+                            <li class="pe-slide-item">
+                                <a href="<?= route('orders-report') ?>" class="pe-nav-link
+                                        @if(request()->routeIs(['orders-report'])) active @endif">
+                                    Order Report
+                                </a>
+                            </li>
+
+
+                            <li class="pe-slide-item">
+                                <a href="<?= route('direct-orders-report') ?>" class="pe-nav-link
+                                        @if(request()->routeIs(['direct-orders-report'])) active @endif">
+                                    Direct Order Report
+                                </a>
+                            </li>
+
+
+                    </ul>
+                </li>
+
+
+
+
+
+                @endif
+
+
+                <li class="pe-slide pe-has-sub mobile-only">
+                    <a href="<?= route('logout') ?>" class="pe-nav-link">
+                        <i class="bi bi-box-arrow-right pe-nav-logout"></i>
+                        <span class="pe-nav-content">Logout</span>
+                    </a>
+                </li>
+
+
+            </ul>
+        </nav>
+    </aside>
+
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+
+<script>
+const menuBtn = document.getElementById("mobileMenuBtn");
+const sidebar = document.getElementById("sidebar");
+const backdrop = document.getElementById("sidebar-backdrop");
+
+menuBtn?.addEventListener("click", () => {
+    sidebar.classList.add("show");
+    backdrop.classList.add("show");
+});
+
+backdrop?.addEventListener("click", () => {
+    sidebar.classList.remove("show");
+    backdrop.classList.remove("show");
+});
+</script>
+
+
+
+<script>
+function updateTime() {
+    const now = new Date();
+
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+    let seconds = now.getSeconds();
+
+    // AM/PM format
+    let ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+
+    // Add leading zero
+    hours = hours < 10 ? '0' + hours : hours;
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    seconds = seconds < 10 ? '0' + seconds : seconds;
+
+    // Date
+    let day = now.getDate();
+    let month = now.getMonth() + 1;
+    let year = now.getFullYear();
+
+    // Format: 08-04-2026
+    day = day < 10 ? '0' + day : day;
+    month = month < 10 ? '0' + month : month;
+
+    let timeString = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
+    let dateString = day + '-' + month + '-' + year;
+
+    // Final output
+    document.getElementById('currentTime').innerText =   dateString + '  ' + timeString  ;
+}
+
+// Update every second
+setInterval(updateTime, 1000);
+
+// Run immediately
+updateTime();
+</script>
+

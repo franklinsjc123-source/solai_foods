@@ -1,0 +1,356 @@
+ @extends('backend.app_template')
+ @section('title','Shop Store or Update')
+ @section('content')
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+ <?php
+
+
+    $id                     = isset($records->id) ? $records->id : '';
+    $user_id                = isset($records->user_id) ? $records->user_id : '';
+    $category               = isset($records->category) ? $records->category : '';
+    $shop_name              = isset($records->shop_name) ? $records->shop_name : '';
+    $is_hotel               = isset($records->is_hotel) ? $records->is_hotel : '';
+    $email                  = isset($records->userData->email) ? $records->userData->email : '';
+    $gst_no                 = isset($records->gst_no) ? $records->gst_no : '';
+    $contact_no             = isset($records->contact_no) ? $records->contact_no : '';
+    $start_time             = isset($records->start_time) ? $records->start_time : '';
+    $end_time               = isset($records->end_time) ? $records->end_time : '';
+    $address                = isset($records->address) ? $records->address : '';
+    $photo_path             = isset($records->file_path) ? $records->file_path:'';
+    $status                 = isset($records->status) ? $records->status:'';
+    $rating                 = isset($records->rating) ? $records->rating:'';
+
+    $type                   = ($id == '')   ? 'Create' : 'Update';
+
+    ?>
+ <main class="app-wrapper">
+     <div class="container-fluid">
+
+         <div class="d-flex align-items-center mt-2 mb-2">
+
+             <div class="flex-shrink-0">
+                 <nav aria-label="breadcrumb">
+                     <ol class="breadcrumb justify-content-end mb-0">
+                         <li class="breadcrumb-item"><a href="javascript:void(0)">Shop</a></li>
+                         <li class="breadcrumb-item active" aria-current="page"><?= $type ?></li>
+                     </ol>
+                 </nav>
+             </div>
+         </div>
+         <div class="row">
+             <div class="col-xl-12 col-xxl-12">
+                 <form method="POST" id="shopForm" action="<?= route('storeUpdateShop') ?>" enctype="multipart/form-data">
+                     @csrf
+                     <div>
+                        <div class="card">
+                             <span></span>
+                             <!-- Logistics Details Section -->
+                             <div class="card-header">
+                                 <h5 class="mb-0"><?= $type ?> Shop </h5>
+                                 <div class="float-end">
+                                     <a href="<?= route('shop') ?>" class="btn btn-primary">Back</a>
+                                 </div>
+                             </div>
+
+                            <input type="hidden" name="id" value="<?= $id ?>" />
+                            <input type="hidden" name="user_id" value="<?= $user_id ?>" />
+
+                             <div class="card-body">
+                                 <div class="row g-4">
+
+                                    <div class="col-xl-4">
+                                        <label class="form-label">Shop Category <span class="text-danger">*</span></label>
+                                        <select class="form-control select2" id="category" name="category[]" multiple data-placeholder="Select">
+                                            @php
+                                                $selectedCategories = isset($category) ? explode(',', $category) : [];
+                                            @endphp
+                                                <?php
+                                                    if (isset($categoryData)) {
+                                                        foreach ($categoryData as $val) { ?>
+                                                        <option value="{{ $val->id }}"
+                                                            {{ in_array($val->id, old('category', $selectedCategories)) ? 'selected' : '' }}>
+                                                            {{ ucwords($val->category_name) }}
+                                                        </option>
+                                                <?php }
+                                                }
+                                                ?>
+                                        </select>
+
+                                        @error('category') <span class="text-danger">{{$message}}</span> @enderror
+
+                                    </div>
+
+                                      <div class="col-xl-4">
+                                            <label for="shop_name" class="form-label">Shop Name <span class="text-danger"> *</span></label>
+                                            <input type="text" value="<?php echo old('shop_name',$shop_name)  ?>" class="form-control" id="shop_name" name="shop_name" placeholder="Enter Shop Name">
+                                            @error('shop_name') <span class="text-danger">{{$message}}</span> @enderror
+
+                                        </div>
+
+
+                                        <div class="col-xl-4">
+                                            <label for="contact_no" class="form-label">
+                                                Contact Number <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="text" class="form-control" id="contact_no" name="contact_no" placeholder="Enter Contact Number" value="<?= old('contact_no',$contact_no) ?? '' ?>" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g,'');"  onkeyup="commonCheckExist(this,'users','mobile', this.value, {{ $user_id ?? 'null' }})">
+                                             <span class="text-danger error-message"></span>
+                                        </div>
+
+                                    <div class="col-xl-4">
+
+                                        <?php
+                                            $user_id = \App\Models\Shop::where('id', $id)->value('user_id');
+                                            ?>
+                                         <label for="email" class="form-label">Email <span class="text-danger"> *</span></label>
+                                         <input type="text" value="<?php echo old('email',$email) ?>" class="form-control" id="email" name="email" placeholder="Enter Email"  onkeyup="commonCheckExist(this,'users','email', this.value, {{ $user_id ?? 'null' }})">
+                                        <span class="text-danger error-message"></span>
+                                    </div>
+
+                                    <div class="col-xl-4">
+                                        <label for="password" class="form-label">
+                                            Password <span class="text-danger">*</span>
+                                        </label>
+
+                                        <div class="position-relative">
+                                            <input type="password" class="form-control pe-5" id="password" name="password" placeholder="Enter Password">
+
+                                            <span class="position-absolute top-50 end-0 translate-middle-y me-3"
+                                                style="cursor: pointer;"
+                                                onclick="togglePassword()">
+                                                <i class="fa fa-eye" id="togglePasswordIcon"></i>
+                                            </span>
+                                        </div>
+
+                                        <span class="text-danger error-message"></span>
+                                    </div>
+
+                                        <div class="col-xl-4">
+                                            <label for="start_time" class="form-label">
+                                                Shop Start Time <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="time" class="form-control" id="start_time" name="start_time" value="<?= old('start_time',$start_time) ?? '' ?>" >
+                                            @error('start_time') <span class="text-danger">{{ $message }}</span> @enderror
+                                        </div>
+
+                                        <div class="col-xl-4">
+                                            <label for="end_time" class="form-label">
+                                                Shop End Time <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="time" class="form-control" id="end_time" name="end_time" value="<?= old('end_time',$end_time) ?? '' ?>"
+                                            >
+                                            @error('end_time') <span class="text-danger">{{ $message }}</span> @enderror
+                                        </div>
+
+                                          <div class="col-xl-4">
+                                            <label for="gst_no" class="form-label">
+                                                GST Number <span class="text-danger"></span>
+                                            </label>
+                                            <input type="text" class="form-control" id="gst_no" name="gst_no" placeholder="Enter GST Number" value="<?= old('gst_no',$gst_no) ?? '' ?>">
+                                            @error('gst_no') <span class="text-danger">{{ $message }}</span> @enderror
+                                        </div>
+
+                                        <div class="col-xl-4">
+                                            <label for="address" class="form-label">
+                                                Shop Address <span class="text-danger">*</span>
+                                            </label>
+                                            <textarea class="form-control" id="address" name="address" rows="1" placeholder="Enter Shop Address"
+                                            ><?= old('address',$address) ?? '' ?></textarea>
+                                            @error('address') <span class="text-danger">{{ $message }}</span> @enderror
+                                        </div>
+
+                                        <div class="col-xl-4">
+
+                                            <label for="photo_path" class="form-label">Shop Image<span class="text-danger"> *</span>  </label>
+
+                                            <input type="hidden" value="<?php echo $photo_path ?>" class="form-control"  name="old_photo_path">
+                                            <input type="file" class="form-control" id="photo_path" name="photo_path">
+                                            <input type="hidden" id="has_old_photo_path" value="<?= !empty($photo_path) ? 1 : 0 ?>">
+
+                                            @if(isset($id) && $photo_path != "")
+                                                    <img class="mt-2" src="<?= $photo_path ?>" alt="image description" width="200" height="100">
+                                                @endif
+
+                                            @if($photo_path =="" )
+                                                @error('photo_path') <span class="text-danger">{{$message}}</span> @enderror
+                                            @endif
+                                        </div>
+
+                                        <div class="col-xl-4">
+                                            <label class="form-label">Is Hotel? <span class="text-danger">*</span></label>
+
+                                            <div class="d-flex gap-4 mt-2">
+
+                                                {{-- YES --}}
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                        type="radio"
+                                                        name="is_hotel"
+                                                        id="is_hotel_yes"
+                                                        value="1"
+                                                        {{ old('is_hotel', $is_hotel ?? 0) == 1 ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="is_hotel_yes">
+                                                        Yes
+                                                    </label>
+                                                </div>
+
+                                                {{-- NO (Default Selected) --}}
+                                                <div class="form-check">
+                                                    <input class="form-check-input"
+                                                        type="radio"
+                                                        name="is_hotel"
+                                                        id="is_hotel_no"
+                                                        value="0"
+                                                        {{ old('is_hotel', $is_hotel ?? 0) == 0 ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="is_hotel_no">
+                                                        No
+                                                    </label>
+                                                </div>
+
+                                            </div>
+
+                                            @error('is_hotel')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+
+
+                                          <div class="col-xl-4">
+                                            <label class="form-label">Rating <span class="text-danger">*</span></label>
+                                            <select class="form-control select2" id="rating" name="rating"  data-placeholder="Select">
+
+                                                <option value="">--Select--</option>
+                                                <option value="0.5" {{ $rating == 0.5 ? 'selected' : '' }}>0.5</option>
+                                                <option value="1.0" {{ $rating == 1.0 ? 'selected' : '' }}>1.0</option>
+                                                <option value="1.5" {{ $rating == 1.5 ? 'selected' : '' }}>1.5</option>
+                                                <option value="2.0" {{ $rating == 2.0 ? 'selected' : '' }}>2.0</option>
+                                                <option value="2.5" {{ $rating == 2.5 ? 'selected' : '' }}>2.5</option>
+                                                <option value="3.0" {{ $rating == 3.0 ? 'selected' : '' }}>3.0</option>
+                                                <option value="3.5" {{ $rating == 3.5 ? 'selected' : '' }}>3.5</option>
+                                                <option value="4.0" {{ $rating == 4.0 ? 'selected' : '' }}>4.0</option>
+                                                <option value="4.5" {{ $rating == 4.5 ? 'selected' : '' }}>4.5</option>
+                                                <option value="5.0" {{ $rating == 5.0 ? 'selected' : '' }}>5.0</option>
+                                            </select>
+
+                                    </div>
+
+
+
+                                </div>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="d-flex justify-content-end gap-3 my-5">
+                         <a href="" class="btn btn-light-light text-muted">Cancel</a>
+                         <button type="submit" class="btn btn-primary">Save</button>
+                     </div>
+                 </form>
+             </div>
+
+         </div>
+         <!-- Submit Section -->
+     </div>
+ </main>
+ <script>
+
+    function togglePassword() {
+        const password = document.getElementById('password');
+        const icon = document.getElementById('togglePasswordIcon');
+
+        if (password.type === 'password') {
+            password.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            password.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
+     $(function() {
+         $("#shopForm").validate({
+             rules: {
+
+                category: {
+                    required: true
+                },
+                shop_name: {
+                    required: true
+                },
+                email: {
+                    required: true
+                },
+
+                contact_no: {
+                    required: true
+                },
+                start_time: {
+                    required: true
+                },
+                end_time: {
+                    required: true
+                },
+                 address: {
+                    required: true
+                },
+
+                 rating: {
+                    required: true
+                },
+
+               photo_path: {
+                    required: function () {
+                        return $('#has_old_photo_path').val() == 0;
+                    }
+                }
+             },
+             messages: {
+
+                category: {
+                    required: "Please enter category name"
+                },
+                 contact_no: {
+                    required: "Please enter contact no"
+                },
+
+                email: {
+                    required: "Please enter email id"
+                },
+                shop_name: {
+                    required: "Please enter shop name"
+                },
+
+                start_time: {
+                    required: "Please enter start time"
+                },
+
+                end_time: {
+                    required: "Please enter end time"
+                },
+
+                address: {
+                    required: "Please enter address"
+                },
+                rating: {
+                    required: "Please select rating"
+                },
+
+                  slider_photo_path: {
+                    required: "Please upload Shop image"
+                }
+
+             },
+            errorElement: "span",
+            errorPlacement: function(error, element) {
+                error.addClass("text-danger small");
+                if (element.hasClass("select2-hidden-accessible")) {
+                    error.insertAfter(element.next('.select2'));
+                } else {
+                    error.insertAfter(element);
+                }
+            }
+         });
+     });
+ </script>
+ @endsection

@@ -1,0 +1,464 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Cart;
+use App\Models\CartItems;
+use App\Models\Product;
+use App\Models\Offers;
+use App\Models\OffersUsed;
+use App\Models\Address;
+use App\Models\PinCode;
+
+use App\Models\ProductAttributes;
+use Carbon\Carbon;
+use App\Models\Category;
+
+
+use Illuminate\Http\Request;
+
+class CartController extends Controller
+{
+
+    public function addToCart(Request $request)
+    {
+        $product_id = $request->product_id;
+        $user_id    = $request->user_id;
+        $unit       = $request->unit;
+        $quantity   = $request->quantity ?? 1;
+
+        if (!$product_id || !$user_id || !$unit) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Parameters Missing'
+            ], 400);
+        }
+
+        $product = Product::find($product_id);
+
+        if (!$product) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Product not found'
+            ], 404);
+        }
+
+        $category_id = $product->category;
+
+
+        $attribute = ProductAttributes::where('product_id', $product_id)
+            ->where('unit', $unit)
+            ->first();
+
+        if (!$attribute) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Unit not found'
+            ], 404);
+        }
+
+        $price = $attribute->discount_price;
+        $discount_price = $attribute->original_price ?? 0;
+
+        $cart = Cart::firstOrCreate(
+            ['user_id' => $user_id],
+            ['total_amount' => 0]
+        );
+
+
+         $foodCategoryId = 10;
+
+        $existingCategories = CartItems::where('cart_id', $cart->id)
+            ->join('products', 'cart_items.product_id', '=', 'products.id')
+            ->pluck('products.category')
+            ->unique()
+            ->toArray();
+
+        if (!empty($existingCategories)) {
+
+            // If Food already exists → block other category
+            if (in_array($foodCategoryId, $existingCategories) && $category_id != $foodCategoryId) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'You cannot add other category products when Food items are in cart'
+                ], 400);
+            }
+
+            // If other category exists → block Food
+            if (!in_array($foodCategoryId, $existingCategories) && $category_id == $foodCategoryId) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'You cannot add Food items when other category products are in cart'
+                ], 400);
+            }
+        }
+
+
+        $item = CartItems::where('cart_id', $cart->id)
+            ->where('product_id', $product_id)
+            ->where('unit', $unit)
+            ->first();
+
+        if ($item) {
+
+            $item->quantity = $quantity;
+            $item->total_price = $quantity * $item->price;
+            $item->save();
+        } else {
+
+            CartItems::create([
+                'cart_id'        => $cart->id,
+                'product_id'     => $product_id,
+                'unit'           => $unit,
+                'quantity'       => $quantity,
+                'price'          => $price,
+                'discount_price' => $discount_price,
+                'total_price'    => $price * $quantity
+            ]);
+        }
+
+        $cart->total_amount = CartItems::where('cart_id', $cart->id)->sum('total_price');
+        $cart->save();
+
+        $cart_count = CartItems::where('cart_id', $cart->id)->count();
+
+        return response()->json([
+            'status'      => true,
+            'message'     => 'Item added to cart successfully',
+            'cart_total'  => number_format($cart->total_amount, 2, '.', ''),
+            'cart_count'  => $cart_count
+        ]);
+    }
+
+    public function viewCart(Request $request)
+    {
+        $user_id = $request->input('user_id');
+
+        if ($user_id != '') {
+
+            $cart = Cart::with(['items.product:id,product_name,product_image'])
+                ->where('user_id', $user_id)
+                ->first();
+
+            if (!$cart) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Cart not found'
+                ], 404);
+            }
+
+
+            $offers = Offers::where('status', 1)
+                ->whereDate('expiry_date', '>=', Carbon::today())
+                ->whereNotIn('id', function($query) use ($user_id, $cart) {
+                    $query->select('offer_id')
+                          ->from('offer_used')
+                          ->where('user_id', $user_id)
+                          ->where('cart_id', '!=', $cart->id);
+                })
+                ->get()
+                ->map(function ($offer) use ($cart, $user_id) {
+
+                    $is_used = OffersUsed::where('offer_id', $offer->id)
+                        ->where('cart_id', $cart->id)
+                        ->where('user_id', $user_id)
+                        ->exists();
+
+                    return [
+                        'id' => $offer->id,
+                        'offer_code' => $offer->offer_code,
+                        'discount_percentage' => $offer->discount_percentage,
+                        'minimum_order_amount' => $offer->minimum_order_amount,
+                        'expiry_date' => $offer->expiry_date,
+                        'is_used' => $is_used ? 1 : 0
+                    ];
+                });
+
+            $delivery_address = Address::where('user_id', $user_id)
+                ->where('is_default', 1)
+                ->first();
+
+            $item_price = CartItems::where('cart_id', $cart->id)
+                ->sum('total_price');
+
+            $appliedOffers = OffersUsed::where('cart_id', $cart->id)
+                ->where('user_id', $user_id)
+                ->pluck('offer_id');
+
+            $discount = 0;
+
+            foreach ($appliedOffers as $offer_id) {
+
+                $offer = Offers::find($offer_id);
+
+                if ($offer) {
+
+                    if ($item_price >= $offer->minimum_order_amount) {
+
+                        $discount += ($item_price * $offer->discount_percentage) / 100;
+                    } else {
+
+                        OffersUsed::where('offer_id', $offer_id)
+                            ->where('cart_id', $cart->id)
+                            ->delete();
+                    }
+                }
+            }
+
+            $delivery_charge = 0;
+
+            $cart = Cart::with('items.product')->where('user_id', $user_id)->first();
+
+            $delivery_charge = 0;
+
+            if ($cart && $cart->items->isNotEmpty()) {
+
+                $category_totals = [];
+
+                foreach ($cart->items as $item) {
+
+                    if (!$item->product) continue;
+
+                    $category_id = (int) $item->product->category;
+
+                    $category_totals[$category_id] = ($category_totals[$category_id] ?? 0) + $item->total_price;
+                }
+
+                foreach ($category_totals as $category_id => $total_price) {
+
+                    if ($category_id == 7) {
+
+                        $delivery_charge += ($total_price > 999)
+                            ? ($total_price * 8) / 100
+                            : ($total_price * 10) / 100;
+                    } elseif ($category_id == 9) {
+
+                        $delivery_charge += ($total_price > 499)
+                            ? ($total_price * 8) / 100
+                            : 50;
+                    } else {
+
+                        $delivery_charge += 50;
+                    }
+                }
+            }
+
+
+            $pincode_charge = 0;
+
+            if ($delivery_address) {
+
+                $pincode_charge = PinCode::where('pincode', $delivery_address->pincode)->value('delivery_charge');
+            }
+
+            $delivery_charge = number_format((float)$delivery_charge + (float)$pincode_charge, 2, '.', '');
+
+            $final_amount = number_format($item_price + (float)$delivery_charge - $discount, 2, '.', '');
+
+            $response = [
+                'id'            => $cart->id,
+                'user_id'       => $cart->user_id,
+                'total_amount'  => number_format($cart->total_amount, 2, '.', ''),
+                'items'         => $cart->items->map(function ($item) {
+                    return [
+                        'id'            => $item->id,
+                        'cart_id'       => $item->cart_id,
+                        'product_id'    => $item->product_id,
+                        'product_name'  => optional($item->product)->product_name,
+                        'product_image' => optional($item->product)->product_image,
+                        'unit'          => $item->unit,
+                        'unit_name'     => optional($item->unitData)->unit_name,
+                        'quantity'      => $item->quantity,
+                        'price'         => number_format($item->price, 2, '.', ''),
+                        'discount_price' => number_format($item->discount_price, 2, '.', ''),
+                        'total_price'   => number_format($item->total_price, 2, '.', ''),
+                    ];
+                })
+            ];
+
+
+            $cart_count = CartItems::where('cart_id', $cart->id)->count();
+
+            $applied_offer_ids = OffersUsed::where('cart_id', $cart->id)
+                ->pluck('id')
+                ->toArray();
+
+            $applied_offers = implode(',', $applied_offer_ids);
+
+
+
+            return response()->json([
+                'status' => 'success',
+                'cart_count' => $cart_count,
+                'item_price' => number_format($item_price, 2, '.', ''),
+                'applied_offers' => $applied_offers,
+                'delivery_charge' => $delivery_charge,
+                'discount' => number_format($discount, 2, '.', ''),
+                'final_amount' => $final_amount,
+                'offers' => $offers,
+                'delivery_address' => $delivery_address,
+                'data' => $response
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Parameters Missing'
+        ], 400);
+    }
+
+    public function updateCartItem(Request $request)
+    {
+        $item_id = $request->input('item_id');
+        $quantity = $request->input('quantity');
+
+        if (!$item_id || $quantity === null) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Parameters Missing'
+            ], 400);
+        }
+
+        $item = CartItems::find($item_id);
+
+        if (!$item) {
+            return response()->json([
+                'status'  => false,
+                'message' => 'Item not found'
+            ], 404);
+        }
+
+        // ✅ Set exact quantity (not add)
+        $item->quantity = $quantity;
+
+        if ($item->quantity <= 0) {
+            $item->delete();
+        } else {
+            $item->total_price = $item->quantity * $item->price;
+            $item->save();
+        }
+
+        $cart = Cart::with('items')->find($item->cart_id);
+
+        if ($cart) {
+            $cart->total_amount = $cart->items->sum('total_price');
+            $cart->save();
+        }
+
+        return response()->json([
+            'status'      => true,
+            'message'     => 'Cart updated successfully',
+            'cart_total'  => $cart ? number_format($cart->total_amount, 2, '.', '') : '0.00'
+        ]);
+    }
+
+
+    public function removeCartItem(Request $request)
+    {
+        $item_id = $request->input('item_id');
+        $user_id = $request->input('user_id');
+
+
+        if ($item_id != '') {
+
+            $item = CartItems::find($item_id);
+
+            if (!$item) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Item not found'
+                ], 404);
+            }
+
+
+            $cart = Cart::find($item->cart_id);
+
+            $item->delete();
+
+            $cart->total_amount = $cart->items()->sum('total_price');
+            $cart->save();
+
+            $cart_count = 0;
+
+            if ($user_id) {
+                $cart = Cart::where('user_id', $user_id)->first();
+
+                if ($cart) {
+                    $cart_count = count(CartItems::where('cart_id', $cart->id)->get());
+                }
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Item removed',
+                'cart_count'  => $cart_count
+
+            ]);
+        } else {
+
+            $error_array = array('status' => 'error', 'message' => 'Parameters Missing');
+            return response()->json(array($error_array), 400);
+        }
+    }
+
+    public function clearCart(Request $request)
+    {
+
+        $user_id = $request->input('user_id');
+
+        if ($user_id != '') {
+
+            $cart = Cart::where('user_id', $user_id)->first();
+
+            if (!$cart) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Cart not found'
+                ], 404);
+            }
+
+            if ($cart) {
+                $cart->items()->delete();
+                $cart->update(['total_amount' => 0]);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Cart cleared'
+            ]);
+        } else {
+
+            $error_array = array('status' => 'error', 'message' => 'Parameters Missing');
+            return response()->json(array($error_array), 400);
+        }
+    }
+
+    public function getCartCount(Request $request)
+    {
+
+        $user_id    = $request->input('user_id');
+
+        $cart_count = 0;
+        if ($user_id) {
+            $cart = Cart::where('user_id', $user_id)->first();
+
+            if ($cart) {
+                $cart_count = count(CartItems::where('cart_id', $cart->id)->get());
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Data received successfully',
+                    'cart_count'  => $cart_count,
+                    'cart_amount'  => $cart->total_amount ? number_format($cart->total_amount, 2, '.', '') : '0.00',
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Cart empty',
+                    'cart_count'  => 0,
+                    'cart_amount'  => 0,
+                ], 400);
+            }
+        }
+    }
+}

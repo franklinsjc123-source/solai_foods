@@ -1,0 +1,82 @@
+<?php
+
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\HomeController;
+use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\AdressController;
+use App\Http\Controllers\Api\OfferController;
+use App\Http\Controllers\Api\DeliveryController;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
+|
+*/
+
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+
+
+
+Route::post('/login',[AuthController::class,"login"])->name('login');
+Route::post('/register',[AuthController::class,"register"])->name('register');
+Route::post('/checkOTP',[AuthController::class,"checkOTP"])->name('checkOTP');
+Route::post('/resendOTP',[AuthController::class,"resendOTP"])->name('resendOTP');
+
+
+Route::post('add-cart', [CartController::class, 'addToCart'])->name('add-cart');
+Route::get('view-cart', [CartController::class, 'viewCart'])->name('view-cart');
+Route::post('update-cart', [CartController::class, 'updateCartItem'])->name('update-cart');
+Route::post('remove-cart-item', [CartController::class, 'removeCartItem'])->name('remove-cart-item');
+Route::get('clear-cart', [CartController::class, 'clearCart'])->name('clear-cart');
+Route::get('cart-count', [CartController::class, 'getCartCount'])->name('cart-count');
+
+
+Route::post('add-address', [AdressController::class, 'addAddress'])->name('add-address');
+Route::post('edit-address', [AdressController::class, 'editAddress'])->name('edit-address');
+Route::get('get-all-address', [AdressController::class, 'getAllAddress'])->name('get-all-address');
+Route::get('delete-address', [AdressController::class, 'deleteAddress'])->name('delete-address');
+Route::post('set-default-address', [AdressController::class, 'setDefaultAddress'])->name('set-default-address');
+
+
+
+Route::get('/getUserDetails',[AuthController::class,"getUserDetails"])->name('getUserDetails');
+Route::get('/getAllCategory',[HomeController::class,"getAllCategory"])->name('getAllCategory');
+Route::get('/getAllProducts',[HomeController::class,"getAllProducts"])->name('getAllProducts');
+Route::get('/getAllSlider',[HomeController::class,"getAllSlider"])->name('getAllSlider');
+
+Route::get('/home-page',[HomeController::class,"getHomePageDetails"])->name('home-page');
+Route::get('/productDetail',[HomeController::class,"productDetail"])->name('productDetail');
+
+
+Route::post('/placeDirectOrder',[OrderController::class,"placeDirectOrder"])->name('placeDirectOrder');
+Route::post('/placeOrder',[OrderController::class,"placeOrder"])->name('placeOrder');
+Route::get('/getAllOrders',[OrderController::class,"getAllOrders"])->name('getAllOrders');
+Route::get('/getOrderDetails',[OrderController::class,"getOrderDetails"])->name('getOrderDetails');
+
+Route::get('/changeOrderStatus',[OrderController::class,"changeOrderStatus"])->name('changeOrderStatus');
+Route::get('/OrderCancel',[OrderController::class,"OrderCancel"])->name('OrderCancel');
+
+
+
+Route::post('applyOffer', [OfferController::class, 'applyOffer'])->name('applyOffer');
+Route::post('removeOffer', [OfferController::class, 'removeOffer'])->name('removeOffer');
+
+
+
+Route::post('/deliveryLogin',[DeliveryController::class,"deliveryLogin"])->name('deliveryLogin');
+Route::get('/getAllNewOrders',[DeliveryController::class,"getAllNewOrders"])->name('getAllNewOrders');
+Route::get('/getDeliveryHistory',[DeliveryController::class,"getDeliveryHistory"])->name('getDeliveryHistory');
+Route::post('/takenOrder',[DeliveryController::class,"takenOrder"])->name('takenOrder');
+Route::post('/declineOrder',[DeliveryController::class,"declineOrder"])->name('declineOrder');
+
