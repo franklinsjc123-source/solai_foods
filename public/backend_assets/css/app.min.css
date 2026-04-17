@@ -427,10 +427,10 @@ File: Main Css File
 
 .btn-primary {
     box-shadow: 0 0.125rem 0.375rem 0 rgba(var(--pe-primary-rgb), 0.3);
-    --pe-btn-bg: #673ab7;
-    --pe-btn-border-color: #673ab7;
-    --pe-btn-hover-bg: #673ab7;
-    --pe-btn-hover-border-color: #673ab7;
+    --pe-btn-bg: #2E7D32;
+    --pe-btn-border-color: #2E7D32;
+    --pe-btn-hover-bg: #2E7D32;
+    --pe-btn-hover-border-color: #2E7D32;
     --pe-btn-active-bg: var(--pe-primary-text-emphasis);
     --pe-btn-active-border-color: var(--pe-primary-text-emphasis);
     --pe-btn-disabled-bg: var(--pe-primary);
@@ -552,18 +552,18 @@ File: Main Css File
 
 .btn-success {
     box-shadow: 0 0.125rem 0.375rem 0 rgba(var(--pe-success-rgb), 0.3);
-    --pe-btn-bg: #673ab7;
-    --pe-btn-border-color: #673ab7;
-    --pe-btn-hover-bg: #673ab7;
-    --pe-btn-hover-border-color: #673ab7;
-    --pe-btn-active-bg: #673ab7;
-    --pe-btn-active-border-color: #673ab7;
+    --pe-btn-bg: #2E7D32;
+    --pe-btn-border-color: #2E7D32;
+    --pe-btn-hover-bg: #2E7D32;
+    --pe-btn-hover-border-color: #2E7D32;
+    --pe-btn-active-bg: #2E7D32;
+    --pe-btn-active-border-color: #2E7D32;
     --pe-btn-disabled-bg: var(--pe-success);
     --pe-btn-disabled-border-color: var(--pe-success);
 }
 .btn-success:first-child:active,
 .btn-success:active {
-    box-shadow: 0 0.125rem 0.375rem 0 #673ab7;
+    box-shadow: 0 0.125rem 0.375rem 0 #2E7D32;
 }
 
 .btn-light-success {
@@ -2447,7 +2447,7 @@ File: Main Css File
     }
 }
 .pe-app-sidebar {
-    background-color: #673ab7;
+    background-color: #2E7D32;
     position: fixed;
     top: 0;
     bottom: 0;
@@ -8463,7 +8463,7 @@ code[class*="language-"] {
 @media (max-width: 991px) {
     .pe-app-sidebar {
         position: fixed !important;
-        background-color: #673ab7 !important;
+        background-color: #2E7D32 !important;
         top: 0;
         left: -280px;
         width: 280px;
@@ -8531,7 +8531,7 @@ code[class*="language-"] {
 /* .spinner {
     width: 60px;
     height: 60px;
-    border: 6px solid #673ab7;
+    border: 6px solid #2E7D32;
     border-top: 6px solid yellow;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
@@ -8541,7 +8541,7 @@ code[class*="language-"] {
     width: 70px;
     height: 70px;
     border-radius: 50%;
-    background: conic-gradient(#673ab7, yellow, #673ab7);
+    background: conic-gradient(#2E7D32, yellow, #2E7D32);
     animation: spin 1s linear infinite;
     position: relative;
 }
@@ -8550,7 +8550,7 @@ code[class*="language-"] {
     width: 70px;
     height: 70px;
     border: 6px solid transparent;
-    border-top: 6px solid #673ab7;
+    border-top: 6px solid #2E7D32;
     border-bottom: 6px solid yellow;
     border-radius: 50%;
     animation: spin 1s linear infinite;
@@ -8559,7 +8559,7 @@ code[class*="language-"] {
 /* .spinner {
     width: 60px;
     height: 60px;
-    background: #673ab7;
+    background: #2E7D32;
     border-radius: 50%;
     animation: pulse 1.2s ease-in-out infinite;
 } */
